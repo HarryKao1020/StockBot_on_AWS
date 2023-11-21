@@ -1,0 +1,13 @@
+line-bot-sdk
+flask
+openai
+numpy
+beautifulsoup4
+requests
+pandas
+datetime 
+matplotlib
+mpl_finance
+gunicorn
+selenium
+python-dotenv
