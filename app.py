@@ -3,6 +3,7 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 from bs4 import BeautifulSoup
+import json
 
 app = Flask(__name__)
 
@@ -12,18 +13,16 @@ handler = WebhookHandler('04279870980e7421fbf1b27cc03165c2')
 
 line_bot_api.push_message('U2032ae75254e026706d91546f58b9af1', TextSendMessage(text='你可以開始了'))
 # 綁定 Line Bot 的 Webhook URL
+
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
-
-    # 取得 request 的 body
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
 
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
-        abort(400)
+        return 'Invalid signature', 400
 
     return 'OK'
 
@@ -34,9 +33,18 @@ def handle_message(event):
     reply_text = f"你說了：{text}"
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
 
-
-if __name__ == "__main__":
-    # 設定 Flask 監聽的 port，這裡設定為 8081，預設port為5000
-    app.run()
+# Lambda 需要一個入口點
+def lambda_handler(event, context):
+    # Lambda 事件處理程序
+    if event['httpMethod'] == 'POST' and event['path'] == '/callback':
+        return {
+            'statusCode': 200,
+            'body': json.dumps(callback())
+        }
+    else:
+        return {
+            'statusCode': 404,
+            'body': 'Not Found'
+        }
 
     

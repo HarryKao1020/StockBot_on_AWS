@@ -1,5 +1,11 @@
-# 使用基礎的 Python image，你可以根據你的需求更換其他基礎 image
-FROM python:3.8
+# 使用 Amazon Linux 作為基礎映像
+FROM python:3.10
+
+# 安裝所需的套件和工具
+# RUN yum update -y && \
+#     yum install -y python3 python3-pip && \
+#     yum clean all
+
 
 # 設定工作目錄
 WORKDIR /app
@@ -12,4 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # 指定 Flask 應用程式運行的指令
-CMD ["python", "app.py"]
+CMD ["app.lambda_handler"]
